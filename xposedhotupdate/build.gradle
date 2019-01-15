@@ -143,17 +143,21 @@ artifacts {
 }
 
 Properties properties = new Properties()
-properties.load(project.file(System.getenv("jcconfig")).newDataInputStream())
+def jcenterConfig = System.getenv("jcconfig")
+if (jcenterConfig != null) [
+
+        properties.load(project.file(jcenterConfig).newDataInputStream())
+]
 bintray {
 
-    user = properties.getProperty("bintray.user")
+    user = jcenterConfig == null ? "" : properties.getProperty("bintray.user")
 
-    key = properties.getProperty("bintray.apikey")
+    key = jcenterConfig == null ? "" : properties.getProperty("bintray.apikey")
 
     configurations = ['archives']
 
     pkg {
-
+//:xposedhotupdate:bintrayUpload -PbintrayUser=luozheng -PbintrayKey=AAAA -PdryRun=false
         repo = "maven"
 
         name = "xposedQuickUpdate" //发布到JCenter上的项目名字
@@ -169,3 +173,19 @@ bintray {
     }
 
 }
+task printUpoad(){
+    def mystr='\n gradlew :xposedhotupdate:bintrayUpload -PbintrayUser=luozheng -PbintrayKey=' + bintray.key+ "-PdryRun=false\n"
+ print("mystr       " +mystr)
+}
+/*
+
+task AstartUpload(type: Exec, description: '执行加固so File 操作') {
+    workingDir "../"
+
+
+    def myCommond = [
+//            new File().absolutePath
+'gradlew:bintrayUpload", '-PbintrayUser=luozheng', '-PbintrayKey=' + bintray.user, "-PdryRun=false"
+    ]
+    commandLine myCommond
+}*/

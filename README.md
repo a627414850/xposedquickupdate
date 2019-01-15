@@ -1,9 +1,7 @@
 ### 导入依赖
 
 ```
-
-
-compile 'cn.qssq666:hollowoutview:0.1'
+compile 'cn.qssq666:xposedhotupdate:0.1'
 ```
 
 ### 修改半透明蒙版颜色
