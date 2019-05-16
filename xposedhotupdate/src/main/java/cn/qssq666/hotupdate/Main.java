@@ -8,7 +8,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 /**
  * Created by qssq on 2019/1/15 qssq666@foxmail.com
  */
-public class Main implements IXposedHookLoadPackage {
+public class Main implements IXposedHookLoadPackage,MainI  {
     private static final String TAG_ = "Main";
 
     @Override
@@ -18,7 +18,7 @@ public class Main implements IXposedHookLoadPackage {
         try {
             Log.w(TAG_, "handleLoadPackageFromCache-start");
             MainAbstract._implClass = Main.class.getName();
-            QuickUpdatePluginCache.handleLoadPackage(loadPackageParam);
+            QuickUpdatePluginCache.handleLoadPackage(loadPackageParam,this);
 //                doHookEnter(loadPackageParam);
         } catch (Throwable throwable) {
             Log.w(TAG_, "handleLoadPackageFromCache-fail");
@@ -27,12 +27,28 @@ public class Main implements IXposedHookLoadPackage {
         }
     }
 
-
-    public void handleLoadPackageFromCache(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    /**
+     * 动态更新成功的调用
+     * @param loadPackageParam
+     */
+    public void handleLoadPackageFromCache(final XC_LoadPackage.LoadPackageParam loadPackageParam)  {
         Log.w(TAG_, "handleLoadPackageFromCache-call");
         doHookEnter(loadPackageParam);
     }
 
+    /**
+     * 动态更新加载失败的时候从这里调用
+     * @param loadPackageParam
+     */
+    @Override
+    public void handleLoadPackageFromOrigin(XC_LoadPackage.LoadPackageParam loadPackageParam) {
+        doHookEnter(loadPackageParam);
+    }
+
+    /**
+     * 最终的hook逻辑
+     * @param loadPackageParam
+     */
     public void doHookEnter(XC_LoadPackage.LoadPackageParam loadPackageParam) {
         //TODO
     }

@@ -1,18 +1,10 @@
 ### 导入依赖
 
 ```
-compile 'cn.qssq666:xposedhotupdate:0.1'
+compile 'cn.qssq666:xposedhotupdate:0.3'
 ```
 
-### 修改半透明蒙版颜色
-直接拿到view然后getPaint()设置颜色即可。
-### 自定义更多透明镂空区域形状
-实现下面的接口就可以实现了
 
-
-```
-
-```
 ### 使用方法
 设置
      MainAbstract._implClass=实现MainAbstract的类.
@@ -20,8 +12,7 @@ compile 'cn.qssq666:xposedhotupdate:0.1'
 
 套路代码
 ```
-
-public class Main implements IXposedHookLoadPackage {
+public class Main implements IXposedHookLoadPackage,MainI  {
     private static final String TAG_ = "Main";
 
     @Override
@@ -31,7 +22,7 @@ public class Main implements IXposedHookLoadPackage {
         try {
             Log.w(TAG_, "handleLoadPackageFromCache-start");
             MainAbstract._implClass = Main.class.getName();
-            QuickUpdatePluginCache.handleLoadPackage(loadPackageParam);
+            QuickUpdatePluginCache.handleLoadPackage(loadPackageParam,this);
 //                doHookEnter(loadPackageParam);
         } catch (Throwable throwable) {
             Log.w(TAG_, "handleLoadPackageFromCache-fail");
@@ -40,17 +31,34 @@ public class Main implements IXposedHookLoadPackage {
         }
     }
 
-
-    public void handleLoadPackageFromCache(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    /**
+     * 动态更新成功的调用
+     * @param loadPackageParam
+     */
+    public void handleLoadPackageFromCache(final XC_LoadPackage.LoadPackageParam loadPackageParam)  {
         Log.w(TAG_, "handleLoadPackageFromCache-call");
         doHookEnter(loadPackageParam);
     }
 
+    /**
+     * 动态更新加载失败的时候从这里调用
+     * @param loadPackageParam
+     */
+    @Override
+    public void handleLoadPackageFromOrigin(XC_LoadPackage.LoadPackageParam loadPackageParam) {
+        doHookEnter(loadPackageParam);
+    }
+
+    /**
+     * 最终的hook逻辑
+     * @param loadPackageParam
+     */
     public void doHookEnter(XC_LoadPackage.LoadPackageParam loadPackageParam) {
         //TODO
     }
 
 }
+
 
 
 

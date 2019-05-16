@@ -13,5 +13,10 @@ public class MainImpl extends MainAbstract {
 
     }
 
+    @Override
+    public void handleLoadPackageFromOrigin(XC_LoadPackage.LoadPackageParam loadPackageParam) {
+
+    }
+
 
 }

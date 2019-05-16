@@ -1,7 +1,8 @@
 package cn.qssq666.hotupdate;
 
-import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
@@ -13,8 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dalvik.system.PathClassLoader;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /**
@@ -70,6 +69,21 @@ public class QuickUpdatePluginCache {
      */
     private static File findApkFile(String thisAppPackage) throws FileNotFoundException {
         File apkFile = null;
+
+        if (apkFile == null) {
+            Context currentContext = XposeUtil.geSystemContext();
+            if (currentContext != null) {
+                try {
+                    PackageInfo packageInfo = currentContext.getPackageManager().getPackageInfo(thisAppPackage, 0);
+
+                    return new File(packageInfo.applicationInfo.sourceDir);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+//            throw new FileNotFoundException("没在/data/app/下找到文件对应的apk文件");
+            return null;
+        }
         try {
             apkFile = findApkFileAfterSDK21(thisAppPackage);
         } catch (Exception e) {
@@ -155,21 +169,13 @@ public class QuickUpdatePluginCache {
      * 实际hook逻辑处理类的入口方法 这种方法可能导致某些进程无法hook到。
      */
 
-    public static boolean handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    public static boolean handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam, MainI main) throws Throwable {
         if (hostAppPackages.contains(loadPackageParam.packageName) || hostAppPackages.isEmpty()) {
-            //将loadPackageParam的classloader替换为宿主程序Application的classloader,解决宿主程序存在多个.dex文件时,有时候ClassNotFound的问题
-            XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    loadPackageParam.classLoader = ((Context) param.args[0]).getClassLoader();
                     final String handleHookClass = MainAbstract.class.getName();
                     invokeHandleHookMethod(BuildConfig.APPLICATION_ID, handleHookClass, "handleLoadPackageFromCache", loadPackageParam);
-
-
-                }
-            });
             return true;
         } else {
+            main.handleLoadPackageFromOrigin(loadPackageParam);
             return false;
         }
     }
