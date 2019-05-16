@@ -51,9 +51,9 @@ public class QuickUpdatePluginCache {
         //加载指定的hook逻辑处理类，并调用它的handleHook方法
         PathClassLoader pathClassLoader = new PathClassLoader(apkFile.getAbsolutePath(), ClassLoader.getSystemClassLoader());
         Class<?> cls = Class.forName(handleHookClass, true, pathClassLoader);
-        Field implClass = cls.getClass().getField("_implClass");
-        String classNameStr = (String) implClass.get(null);
-        cls = pathClassLoader.loadClass(classNameStr);
+//        Field implClass = cls.getClass().getField("_implClass");
+//        String classNameStr = (String) implClass.get(null);
+        cls = pathClassLoader.loadClass(MainAbstract._implClass);
         Object instance = cls.newInstance();
         Method method = cls.getDeclaredMethod(handleHookMethodName, XC_LoadPackage.LoadPackageParam.class);
         method.invoke(instance, loadPackageParam);
@@ -78,11 +78,10 @@ public class QuickUpdatePluginCache {
 
                     return new File(packageInfo.applicationInfo.sourceDir);
                 } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
+                    Log.w(TAG,"找不到plugin "+thisAppPackage,e);
                 }
             }
 //            throw new FileNotFoundException("没在/data/app/下找到文件对应的apk文件");
-            return null;
         }
         try {
             apkFile = findApkFileAfterSDK21(thisAppPackage);
@@ -172,7 +171,7 @@ public class QuickUpdatePluginCache {
     public static boolean handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam, MainI main) throws Throwable {
         if (hostAppPackages.contains(loadPackageParam.packageName) || hostAppPackages.isEmpty()) {
                     final String handleHookClass = MainAbstract.class.getName();
-                    invokeHandleHookMethod(BuildConfig.APPLICATION_ID, handleHookClass, "handleLoadPackageFromCache", loadPackageParam);
+                    invokeHandleHookMethod(MainAbstract._pluginPackageName, handleHookClass, "handleLoadPackageFromCache", loadPackageParam);
             return true;
         } else {
             main.handleLoadPackageFromOrigin(loadPackageParam);

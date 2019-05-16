@@ -9,4 +9,5 @@ public abstract class MainAbstract implements MainI {
     public static String _implClass = MainImpl.class.getName();
 
 
+    public static String _pluginPackageName;
 }

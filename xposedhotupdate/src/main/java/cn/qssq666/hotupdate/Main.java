@@ -18,6 +18,7 @@ public class Main implements IXposedHookLoadPackage,MainI  {
         try {
             Log.w(TAG_, "handleLoadPackageFromCache-start");
             MainAbstract._implClass = Main.class.getName();
+            MainAbstract._pluginPackageName= BuildConfig.APPLICATION_ID;
             QuickUpdatePluginCache.handleLoadPackage(loadPackageParam,this);
 //                doHookEnter(loadPackageParam);
         } catch (Throwable throwable) {

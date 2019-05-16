@@ -1,14 +1,14 @@
 ### 导入依赖
 
 ```
-compile 'cn.qssq666:xposedhotupdate:0.3'
+compile 'cn.qssq666:xposedhotupdate:0.6'
 ```
 
 
 ### 使用方法
 设置
      MainAbstract._implClass=实现MainAbstract的类.
-
+    MainAbstract._pluginPackageName= BuildConfig.APPLICATION_ID;//插件包名
 
 套路代码
 ```
@@ -21,6 +21,7 @@ public class Main implements IXposedHookLoadPackage,MainI  {
         Log.w(TAG_, "HOOKUI_handleLoadPackage" + loadPackageParam.packageName + " " + loadPackageParam.processName + " " + loadPackageParam.isFirstApplication);
         try {
             Log.w(TAG_, "handleLoadPackageFromCache-start");
+                MainAbstract._pluginPackageName= BuildConfig.APPLICATION_ID;
             MainAbstract._implClass = Main.class.getName();
             QuickUpdatePluginCache.handleLoadPackage(loadPackageParam,this);
 //                doHookEnter(loadPackageParam);
